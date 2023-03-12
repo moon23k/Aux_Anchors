@@ -1,20 +1,17 @@
-## SumNMT
-This repo covers a series of codes to deal with Text Summarization and Neural Machine Translation at once.
-Maybe the most simple way to make complexed model is to join Two Independent Models. But the main purpose in repo is to make End-to-End Model.
-The most difficult matter for this is to retain Training Dataset. Unfortunately, I failed to get open-source dataset on this Task. So I decided to make my own dataset by myself. 
+## Sum Semantic And Length based generative Training
+
+Compare this with plain Generative Training based on ROUGE score.
 
 <br>
 <br>
 
-## Dataset
+## Methodology
 
 <br>
 <br>
 
 
-## Configurations
-
-**Transformer**
+## Experimental Setup
 
 
 <br>
@@ -28,11 +25,15 @@ The most difficult matter for this is to retain Training Dataset. Unfortunately,
 
 
 ## How to Use
+```
+git clone
+```
 
-<br>
-<br>
+```
+python3 setup.py
+```
 
-## Reference
-Text Summarizatin with Pretrained Encoders
-
+```
+python3 run.py -mode ['train', 'test', 'inference'] -strategy ['rouge', 'salt']
+```
 <br>
