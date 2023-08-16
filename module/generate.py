@@ -7,9 +7,9 @@ from collections import namedtuple
 
 
 
-class Search:
+class Generator:
     def __init__(self, config, model):
-        super(Search, self).__init__()
+        super(Generator, self).__init__()
         
         self.model = model
         self.device = model.device
