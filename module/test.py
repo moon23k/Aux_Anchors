@@ -1,4 +1,4 @@
-import torch, math, time, evaluate
+import time, math, torch, evaluate
 
 
 
@@ -14,7 +14,6 @@ class Tester:
         self.bos_id = config.bos_id
         self.device = config.device
         self.max_len = config.max_len
-        self.model_type = config.model_type
         
         self.metric_name = 'BLEU' if self.task == 'nmt' else 'ROUGE'
         self.metric_module = evaluate.load(self.metric_name.lower())

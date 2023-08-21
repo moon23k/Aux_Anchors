@@ -113,12 +113,28 @@ class Decoder(nn.Module):
 
 
 
-class TorchModel(ModelBase):
+class Transformer(mm.Module):
     def __init__(self, config):
-        super(TorchModel, self).__init__(config)
+        super(Transformer, self).__init__()
         
+        self.device = config.device
+        self.pad_id = config.pad_id
+        self.vocab_size = config.vocab_size
+
         self.encoder = Encoder(config)
         self.decoder = Decoder(config)
+        self.generator = nn.Linear(config.hidden_dim, self.vocab_size)
+
+        self.out = namedtuple('Out', 'logit loss')
+        self.criterion = nn.CrossEntropyLoss(
+            ignore_index=self.pad_id, 
+            label_smoothing=0.1
+        ).to(self.device)
+
+
+    @staticmethod
+    def shift_trg(x):
+        return x[:, :-1], x[:, 1:]
 
     
     def pad_mask(self, x):
@@ -136,3 +152,22 @@ class TorchModel(ModelBase):
 
     def decode(self, x, memory, e_mask, d_mask):
         return self.decoder(x, memory, e_mask, d_mask)        
+
+
+    def forward(self, src, trg):
+        trg, label = self.shift_trg(trg)
+        
+        e_mask = self.pad_mask(src) 
+        d_mask = self.dec_mask(trg)
+
+        memory = self.encode(src, e_mask)
+        dec_out = self.decode(trg, memory, e_mask, d_mask)
+        logit = self.generator(dec_out)
+
+        self.out.logit = logit
+        self.out.loss = self.criterion(
+            logit.contiguous().view(-1, self.vocab_size), 
+            label.contiguous().view(-1)
+        )
+
+        return self.out

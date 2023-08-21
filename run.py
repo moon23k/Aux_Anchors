@@ -13,7 +13,6 @@ from module import (
 
 
 
-
 def set_seed(SEED=42):
     import random
     import numpy as np
@@ -26,7 +25,6 @@ def set_seed(SEED=42):
     torch.cuda.manual_seed_all(SEED)
     cudnn.benchmark = False
     cudnn.deterministic = True
-
 
 
 
@@ -79,27 +77,6 @@ def load_tokenizer(config):
 
 
 
-def inference(config, model, tokenizer):
-    search_module = Search(config, model, tokenizer)
-
-    print(f'--- Inference Process Started! ---')
-    print('[ Type "quit" on user input to stop the Process ]')
-    
-    while True:
-        input_seq = input('\nUser Input Sequence >> ').lower()
-
-        #End Condition
-        if input_seq == 'quit':
-            print('\n--- Inference Process has terminated! ---')
-            break        
-
-        if config.search_method == 'beam':
-            output_seq = search_module.beam_search(input_seq)
-        else:
-            output_seq = search_module.greedy_search(input_seq)
-        print(f"Model Out Sequence >> {output_seq}")       
-
-
 def main(args):
     set_seed()
     config = Config(args)
@@ -117,11 +94,11 @@ def main(args):
         test_dataloader = load_dataloader(config, 'test')
         tester = Tester(config, model, tokenizer, test_dataloader)
         tester.test()
-        tester.inference_test()
     
     elif config.mode == 'inference':
-        translator = inference(config, model, tokenizer)
-        translator.translate()
+        generator = Generator(config, model, tokenizer)
+        generator.inference()
+    
     
 
 

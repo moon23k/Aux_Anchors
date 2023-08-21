@@ -18,8 +18,10 @@ class Trainer:
         self.device = config.device
         self.n_epochs = config.n_epochs
         self.vocab_size = config.vocab_size
+
         self.early_stop = config.early_stop
         self.patience = config.patience
+        
         self.device_type = config.device_type
         self.scaler = torch.cuda.amp.GradScaler()
         self.iters_to_accumulate = config.iters_to_accumulate        
@@ -107,11 +109,11 @@ class Trainer:
 
         for idx, batch in enumerate(self.train_dataloader):
             idx += 1
-            src = batch['src'].to(self.device)
-            trg = batch['trg'].to(self.device)
+            x = batch['src'].to(self.device)
+            y = batch['trg'].to(self.device)
 
             with torch.autocast(device_type=self.device_type, dtype=torch.float16):
-                loss = self.model(src, trg).loss                
+                loss = self.model(x, y).loss                
                 loss = loss / self.iters_to_accumulate
             
             #Backward Loss
@@ -141,11 +143,11 @@ class Trainer:
         
         with torch.no_grad():
             for batch in self.valid_dataloader:
-                src = batch['src'].to(self.device)
-                trg = batch['trg'].to(self.device)
+                x = batch['src'].to(self.device)
+                y = batch['trg'].to(self.device)
                 
                 with torch.autocast(device_type=self.device_type, dtype=torch.float16):
-                    loss = self.model(src, trg).loss
+                    loss = self.model(x, y).loss
 
                 epoch_loss += loss.item()
         
