@@ -1,1 +1,1 @@
-from .model import Transformer
+from .transformer import Transformer

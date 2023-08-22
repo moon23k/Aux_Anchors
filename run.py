@@ -43,16 +43,12 @@ class Config(object):
 
         if self.task == 'sum':
             self.batch_size = self.batch_size // 4
-
-        use_cuda = torch.cuda.is_available()
-        self.device_type = 'cuda' if use_cuda else 'cpu'
         
-        if self.task == 'inference':
-            self.search_method = args.search
-            self.device = torch.device('cpu')
-        else:
-            self.search = None
-            self.device = torch.device(self.device_type)
+        use_cuda = torch.cuda.is_available()
+        self.device_type = 'cuda' \
+                           if use_cuda and self.mode != 'inference' \
+                           else 'cpu'
+        self.device = torch.device(self.device_type)
 
 
     def print_attr(self):

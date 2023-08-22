@@ -113,12 +113,13 @@ class Decoder(nn.Module):
 
 
 
-class Transformer(mm.Module):
+class Transformer(nn.Module):
     def __init__(self, config):
         super(Transformer, self).__init__()
         
         self.device = config.device
         self.pad_id = config.pad_id
+        self.bos_id = config.bos_id
         self.vocab_size = config.vocab_size
 
         self.encoder = Encoder(config)
@@ -161,13 +162,27 @@ class Transformer(mm.Module):
         d_mask = self.dec_mask(trg)
 
         memory = self.encode(src, e_mask)
-        dec_out = self.decode(trg, memory, e_mask, d_mask)
-        logit = self.generator(dec_out)
 
-        self.out.logit = logit
-        self.out.loss = self.criterion(
+        dec_out = self.decode(trg, memory, e_mask, d_mask)
+        _dec_out = self.decode(trg[:, 0], memory, e_mask, d_mask[:, 0])
+        
+
+        logit = self.generator(dec_out)
+        _logit = self.generator(_dec_out)
+
+
+        loss = self.criterion(
             logit.contiguous().view(-1, self.vocab_size), 
             label.contiguous().view(-1)
         )
+
+        _loss = self.criterion(
+            logit.contiguous().view(-1, self.vocab_size), 
+            label[:, 0].contiguous().view(-1)
+        )        
+
+
+        self.out.logit = logit
+        self.out.loss = (loss * 0.5) + (_loss * 0.5) 
 
         return self.out
