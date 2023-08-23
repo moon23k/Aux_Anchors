@@ -39,6 +39,7 @@ class Config(object):
 
         self.task = args.task
         self.mode = args.mode
+        self.search_method = args.search
         self.ckpt = f"ckpt/{self.task}.pt"
 
         if self.task == 'sum':

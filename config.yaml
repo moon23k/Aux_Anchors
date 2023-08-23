@@ -28,3 +28,4 @@ train:
     patience: 3
     clip: 1
     iters_to_accumulate: 4
+    aux_ratio: 0.5

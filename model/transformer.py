@@ -155,16 +155,17 @@ class Transformer(nn.Module):
         return self.decoder(x, memory, e_mask, d_mask)        
 
 
-    def forward(self, src, trg):
-        trg, label = self.shift_trg(trg)
+    def forward(self, x, y):
+        y, label = self.shift_trg(y)
+        _y = y[:, 0].unsqueeze(1)
         
-        e_mask = self.pad_mask(src) 
-        d_mask = self.dec_mask(trg)
+        e_mask = self.pad_mask(x) 
+        d_mask = self.dec_mask(y)
 
-        memory = self.encode(src, e_mask)
+        memory = self.encode(x, e_mask)
 
-        dec_out = self.decode(trg, memory, e_mask, d_mask)
-        _dec_out = self.decode(trg[:, 0], memory, e_mask, d_mask[:, 0])
+        dec_out = self.decode(y, memory, e_mask, d_mask)
+        _dec_out = self.decode(_y, memory, e_mask, None)
         
 
         logit = self.generator(dec_out)
