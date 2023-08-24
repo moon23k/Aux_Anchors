@@ -77,9 +77,12 @@ class Encoder(nn.Module):
 
 
     def forward(self, x, e_mask):
+
         x = self.embeddings(x)
+        
         for layer in self.layers:
             x = layer(x, src_key_padding_mask=e_mask)
+        
         return x
 
 
@@ -102,13 +105,16 @@ class Decoder(nn.Module):
 
 
     def forward(self, x, memory, e_mask, d_mask):
+        
         x = self.embeddings(x)
+
         for layer in self.layers:
             x = layer(
                 x, memory, 
                 memory_key_padding_mask=e_mask,
                 tgt_mask=d_mask,
             )
+        
         return x
 
 
@@ -118,6 +124,8 @@ class Transformer(nn.Module):
         super(Transformer, self).__init__()
         
         self.device = config.device
+        self.aux_ratio = config.aux_ratio
+
         self.pad_id = config.pad_id
         self.bos_id = config.bos_id
         self.vocab_size = config.vocab_size
@@ -152,38 +160,47 @@ class Transformer(nn.Module):
 
 
     def decode(self, x, memory, e_mask, d_mask):
-        return self.decoder(x, memory, e_mask, d_mask)        
+        return self.decoder(x, memory, e_mask, d_mask)       
+
+
+    def get_aux_loss(self, y, memory, e_mask):
+        
+        label = y[:, 1]
+        y = y[:, 0].unsqueeze(1)
+
+        dec_out = self.decode(y, memory, e_mask, None)
+        logit = self.generator(dec_out)
+
+        aux_loss = self.criterion(
+            logit.contiguous().view(-1, self.vocab_size), 
+            label.contiguous().view(-1)
+        )
+
+        return aux_loss
 
 
     def forward(self, x, y):
         y, label = self.shift_trg(y)
-        _y = y[:, 0].unsqueeze(1)
         
         e_mask = self.pad_mask(x) 
         d_mask = self.dec_mask(y)
 
         memory = self.encode(x, e_mask)
-
         dec_out = self.decode(y, memory, e_mask, d_mask)
-        _dec_out = self.decode(_y, memory, e_mask, None)
-        
-
         logit = self.generator(dec_out)
-        _logit = self.generator(_dec_out)
-
 
         loss = self.criterion(
             logit.contiguous().view(-1, self.vocab_size), 
             label.contiguous().view(-1)
         )
 
-        _loss = self.criterion(
-            logit.contiguous().view(-1, self.vocab_size), 
-            label[:, 0].contiguous().view(-1)
-        )        
-
-
         self.out.logit = logit
-        self.out.loss = (loss * 0.5) + (_loss * 0.5) 
+
+        if self.aux_ratio:
+            aux_loss = self.get_aux_loss(y, memory, e_mask)
+            self.out.loss = loss * (1 - self.aux_ratio) + \
+                            aux_loss * self.aux_ratio
+        else:    
+            self.out.loss = loss 
 
         return self.out

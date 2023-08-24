@@ -34,7 +34,7 @@ class Tester:
                 
                 score += self.evaluate(pred, y)
 
-        txt = f"TEST Result on {self.task.upper()} with {self.model_type.upper()} model"
+        txt = f"TEST Result on {self.task.upper()}"
         txt += f"\n-- Score: {round(score/len(self.dataloader), 2)}\n"
         print(txt)
 
