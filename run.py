@@ -39,8 +39,9 @@ class Config(object):
 
         self.task = args.task
         self.mode = args.mode
+        self.aux_ratio = args.aux_ratio
         self.search_method = args.search
-        self.ckpt = f"ckpt/{self.task}.pt"
+        self.ckpt = f"ckpt/{self.task}/aux_{str(self.aux_ratio)[-1]}0_model.pt"
 
         if self.task == 'sum':
             self.batch_size = self.batch_size // 4
@@ -103,11 +104,18 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-task', required=True)
     parser.add_argument('-mode', required=True)
+    parser.add_argument('-aux_ratio', type=float, required=True)
     parser.add_argument('-search', default='greedy', required=False)
     
     args = parser.parse_args()
-    assert args.task in ['nmt', 'dialog', 'sum']
+    assert args.task in ['translation', 'dialogue', 'summarization']
     assert args.mode in ['train', 'test', 'inference']
+    assert 0.0 <= args.aux_ratio <= 1.0, "The aux_ratio should be within the range of 0.0 to 1.0."
     assert args.search in ['greedy', 'beam']
+
+    if args.mode == 'train':
+        os.makedirs(f"ckpt/{args.task}", exist_ok=True)
+    else:
+        assert os.path.exists(f'ckpt/{args.task}/{args.model}_model.pt')
 
     main(args)

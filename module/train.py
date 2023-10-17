@@ -109,8 +109,8 @@ class Trainer:
 
         for idx, batch in enumerate(self.train_dataloader):
             idx += 1
-            x = batch['src'].to(self.device)
-            y = batch['trg'].to(self.device)
+            x = batch['x'].to(self.device)
+            y = batch['y'].to(self.device)
 
             with torch.autocast(device_type=self.device_type, dtype=torch.float16):
                 loss = self.model(x, y).loss                
@@ -143,8 +143,8 @@ class Trainer:
         
         with torch.no_grad():
             for batch in self.valid_dataloader:
-                x = batch['src'].to(self.device)
-                y = batch['trg'].to(self.device)
+                x = batch['x'].to(self.device)
+                y = batch['y'].to(self.device)
                 
                 with torch.autocast(device_type=self.device_type, dtype=torch.float16):
                     loss = self.model(x, y).loss

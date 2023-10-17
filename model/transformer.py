@@ -164,7 +164,6 @@ class Transformer(nn.Module):
 
 
     def get_aux_loss(self, y, memory, e_mask):
-        
         label = y[:, 1]
         y = y[:, 0].unsqueeze(1)
 
