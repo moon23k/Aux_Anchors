@@ -42,9 +42,6 @@ class Config(object):
         self.aux_ratio = args.aux_ratio
         self.search_method = args.search
         self.ckpt = f"ckpt/{self.task}/aux_{str(self.aux_ratio)[-1]}0_model.pt"
-
-        if self.task == 'sum':
-            self.batch_size = self.batch_size // 4
         
         use_cuda = torch.cuda.is_available()
         self.device_type = 'cuda' \
@@ -89,7 +86,7 @@ def main(args):
         trainer.train()
     
     elif config.mode == 'test':
-        test_dataloader = load_dataloader(config, 'test')
+        test_dataloader = load_dataloader(config, tokenizer, 'test')
         tester = Tester(config, model, tokenizer, test_dataloader)
         tester.test()
     
@@ -116,6 +113,6 @@ if __name__ == '__main__':
     if args.mode == 'train':
         os.makedirs(f"ckpt/{args.task}", exist_ok=True)
     else:
-        assert os.path.exists(f'ckpt/{args.task}/{args.model}_model.pt')
+        assert os.path.exists(f"ckpt/{self.task}/aux_{str(self.aux_ratio)[-1]}0_model.pt")
 
     main(args)

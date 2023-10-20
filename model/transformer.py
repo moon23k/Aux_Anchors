@@ -155,19 +155,11 @@ class Transformer(nn.Module):
         return torch.triu(torch.full((sz, sz), float('-inf')), diagonal=1).to(self.device)
 
 
-    def encode(self, x, e_mask):
-        return self.encoder(x, e_mask)
-
-
-    def decode(self, x, memory, e_mask, d_mask):
-        return self.decoder(x, memory, e_mask, d_mask)       
-
-
     def get_aux_loss(self, y, memory, e_mask):
         label = y[:, 1]
         y = y[:, 0].unsqueeze(1)
 
-        dec_out = self.decode(y, memory, e_mask, None)
+        dec_out = self.decoder(y, memory, e_mask, None)
         logit = self.generator(dec_out)
 
         aux_loss = self.criterion(
@@ -184,8 +176,8 @@ class Transformer(nn.Module):
         e_mask = self.pad_mask(x) 
         d_mask = self.dec_mask(y)
 
-        memory = self.encode(x, e_mask)
-        dec_out = self.decode(y, memory, e_mask, d_mask)
+        memory = self.encoder(x, e_mask)
+        dec_out = self.decoder(y, memory, e_mask, d_mask)
         logit = self.generator(dec_out)
 
         loss = self.criterion(
