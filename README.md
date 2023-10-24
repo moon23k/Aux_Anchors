@@ -26,18 +26,18 @@ Performance evaluation is conducted in the domains of Machine Translation, Dialo
 ## Experimental Setup
 | Data Setup | Model Setup | Training Setup |
 |---|---|---|
-
+||||
 
 <br><br>
 
 
 ## Results
-| Aux Training Objective | Main Training Objective | Machine Translation | Dialogue Generation | Text Summarization |
-|:---:|:---:|:---:|:---:|:---:|
-|  0% | 100% |-|-|-|
-| 10% |  90% |-|-|-|
-| 30% |  70% |-|-|-|
-| 50% |  50% |-|-|-|
+| Aux Training Ratio | Machine Translation | Dialogue Generation | Text Summarization |
+|:---:|:---|:---|:---|
+| 0.0 | **`BLEU:`** 23.10<br>**`First Token Prediction:`**  | **`ROUGE:`** 0.29<br>**`First Token Prediction:`** | **`ROUGE:`** 00.00<br>**`First Token Prediction:`** |
+| 0.1 | **`BLEU:`** 20.95<br>**`First Token Prediction:`**  | **`ROUGE:`** 0.30<br>**`First Token Prediction:`** | **`ROUGE:`** 00.00<br>**`First Token Prediction:`** |
+| 0.3 | **`BLEU:`**  5.32<br>**`First Token Prediction:`**  | **`ROUGE:`** 0.58<br>**`First Token Prediction:`** | **`ROUGE:`** 00.00<br>**`First Token Prediction:`** |
+| 0.5 | **`BLEU:`** 6.97<br>**`First Token Prediction:`**  | **`ROUGE:`** 0.36<br>**`First Token Prediction:`** | **`ROUGE:`** 00.00<br>**`First Token Prediction:`** |
 
 <br><br>
 
