@@ -135,10 +135,7 @@ class Transformer(nn.Module):
         self.generator = nn.Linear(config.hidden_dim, self.vocab_size)
 
         self.out = namedtuple('Out', 'logit loss')
-        self.criterion = nn.CrossEntropyLoss(
-            ignore_index=self.pad_id, 
-            label_smoothing=0.1
-        ).to(self.device)
+        self.criterion = nn.CrossEntropyLoss()
 
 
     @staticmethod
@@ -192,6 +189,6 @@ class Transformer(nn.Module):
             self.out.loss = loss * (1 - self.aux_ratio) + \
                             aux_loss * self.aux_ratio
         else:    
-            self.out.loss = loss 
+            self.out.loss = loss
 
         return self.out

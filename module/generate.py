@@ -69,7 +69,8 @@ class Generator:
 
         
         for i in range(1, self.max_len):
-            dec_out = self.model.decoder(output, memory, e_mask, None)            
+            d_mask = self.model.dec_mask(output)
+            dec_out = self.model.decoder(output, memory, e_mask, d_mask)            
             logit = self.model.generator(dec_out)
             
             next_token = logit[:, -1].argmax(-1).unsqueeze(0)
@@ -138,8 +139,8 @@ class Generator:
                     continue
 
                 d_input = torch.LongTensor([curr_node.pred]).to(self.device)
-
-                d_out = self.model.decoder(d_input, memory, e_mask, None)                                           
+                d_mask = self.model.dec_mask(d_input)
+                d_out = self.model.decoder(d_input, memory, e_mask, d_mask)                                           
                 out = self.model.generator(d_out)[:, -1]
                 
                 logits, preds = torch.topk(out, self.beam_size)

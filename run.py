@@ -113,6 +113,6 @@ if __name__ == '__main__':
     if args.mode == 'train':
         os.makedirs(f"ckpt/{args.task}", exist_ok=True)
     else:
-        assert os.path.exists(f"ckpt/{self.task}/aux_{str(self.aux_ratio)[-1]}0_model.pt")
+        assert os.path.exists(f"ckpt/{args.task}/aux_{str(args.aux_ratio)[-1]}0_model.pt")
 
     main(args)

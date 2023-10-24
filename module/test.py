@@ -1,4 +1,4 @@
-import torch, math, time, evaluate
+import time, math, torch, evaluate
 
 
 
@@ -12,30 +12,32 @@ class Tester:
 
         self.task = config.task
         self.bos_id = config.bos_id
+        self.pad_id = config.pad_id
         self.device = config.device
         self.max_len = config.max_len
         
-        self.metric_name = 'BLEU' if self.task == 'nmt' else 'ROUGE'
+        self.metric_name = 'BLEU' if self.task == 'translation' else 'ROUGE'
         self.metric_module = evaluate.load(self.metric_name.lower())
         
 
 
     def test(self):
-        score = 0.0         
+        score, aux_score = 0.0, 0.0         
         self.model.eval()
 
         with torch.no_grad():
             for batch in self.dataloader:
                 x = batch['x'].to(self.device)
-                y = self.tokenize(batch['y'])
+                y = batch['y']
 
                 pred = self.predict(x)
-                pred = self.tokenize(pred)
-                
-                score += self.evaluate(pred, y)
+                scores = self.evaluate(pred, y)
+                score += scores[0]
+                aux_score += scores[1]
 
-        txt = f"TEST Result on {self.task.upper()}"
-        txt += f"\n-- Score: {round(score/len(self.dataloader), 2)}\n"
+        txt = f"TEST Result on {self.task.upper()} Task\n"
+        txt += f"-- {self.metric_name} Score: {round(score/len(self.dataloader), 2)}\n"
+        txt += f"-- First Token Prediction Acc: {round(aux_score/len(self.dataloader), 2)}\n"
         print(txt)
 
 
@@ -46,7 +48,7 @@ class Tester:
     def predict(self, x):
 
         batch_size = x.size(0)
-        pred = torch.zeros((batch_size, self.max_len))
+        pred = torch.zeros((batch_size, self.max_len)).fill_(self.pad_id)
         pred = pred.type(torch.LongTensor).to(self.device)
         pred[:, 0] = self.bos_id
 
@@ -66,17 +68,22 @@ class Tester:
 
 
     def evaluate(self, pred, label):
-        #For NMT Evaluation
-        if self.task == 'nmt':
+        aux_score = (pred[:, 0] == label[:, 0]).sum().item() / pred.size(0) * 100
+
+        pred = self.tokenize(pred)
+        label = self.tokenize(label)
+
+        #For TRANSLATION Evaluation
+        if self.task == 'translation':
             score = self.metric_module.compute(
                 predictions=pred, 
                 references =[[l] for l in label]
-            )['bleu']
-        #For Dialg & Sum Evaluation
+            )['bleu'] * 100
+        #For DIALOGUE & SUMMARIZATION Evaluation
         else:
             score = self.metric_module.compute(
                 predictions=pred, 
                 references =[[l] for l in label]
-            )['rouge2']
+            )['rouge2'] * 100
 
-        return score * 100
+        return score, aux_score
