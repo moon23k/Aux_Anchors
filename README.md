@@ -1,26 +1,15 @@
 ## Auxiliary Training for Natural Language Generation
-The Transformer is the most widely used model architecture in various natural language processing tasks. However, in models designed for Natural Language Generation, training is carried out using Teacher Forcing through masking.
-In practice, during the inference process for Natural Language Generation, the final inference results are generated based solely on the model's predictions. 
-This discrepancy between training and inference has a detrimental effect on the model's performance.
-One of the most intuitive ways to address this discrepancy is to align the training and inference processes and conduct extensive training based on a large amount of data. 
-However, the former approach suffers from low training efficiency, while the latter faces challenges in data acquisition and resource-intensive training.
-Therefore, in this repository, an approach is proposed that maintains efficient parallel training of a typical Transformer model while utilizing auxiliary Training Objectives to mitigate the impact of this discrepancy. 
-The main objective is set as Maximum Likelihood Estimation (MLE), and the auxiliary Training Objective is First Token Prediction. 
-Performance evaluation is conducted in the domains of Machine Translation, Dialogue Generation, and Text Summarization.
+
+&nbsp; Transformer-based deep learning models for natural language generation tasks employ masking and teacher forcing during the training phase. 
+However, during actual inference, they only utilize model predictions without teacher forcing. 
+This gap between training and inference causes negative impact on model performances.
+There are two approaches to address this discrepancy.
+The first is to train large-scale models on extensive datasets. The second is to align the training and inference processes for generative learning. 
+However, the first approach demands substantial computational resources, and the second approach suffers from the inefficiency of the training process.
+To tackle this issue, in this repository, we propose a method that maintains the main training objective as MLE while additionally incorporating an auxiliary training objective called "First Token Prediction." 
+We then evaluate the performance of this approach across three natural language generation tasks.
 
 <br><br>
-
-## Training Objectives
-
-**Main Training Objectives**
-> Maximum Likelihood Estimation
-
-<br> 
-
-**Auxiliary Training Objectives**
-> First Token Prediction
-
-<br><br> 
 
 
 ## Experimental Setup
@@ -34,10 +23,10 @@ Performance evaluation is conducted in the domains of Machine Translation, Dialo
 ## Results
 | Aux Training Ratio | Machine Translation | Dialogue Generation | Text Summarization |
 |:---:|:---|:---|:---|
-| 0.0 | **`BLEU:`** 23.10<br>**`First Token Prediction:`**  | **`ROUGE:`** 0.29<br>**`First Token Prediction:`** | **`ROUGE:`** 00.00<br>**`First Token Prediction:`** |
-| 0.1 | **`BLEU:`** 20.95<br>**`First Token Prediction:`**  | **`ROUGE:`** 0.30<br>**`First Token Prediction:`** | **`ROUGE:`** 00.00<br>**`First Token Prediction:`** |
-| 0.3 | **`BLEU:`**  5.32<br>**`First Token Prediction:`**  | **`ROUGE:`** 0.58<br>**`First Token Prediction:`** | **`ROUGE:`** 00.00<br>**`First Token Prediction:`** |
-| 0.5 | **`BLEU:`** 6.97<br>**`First Token Prediction:`**  | **`ROUGE:`** 0.36<br>**`First Token Prediction:`** | **`ROUGE:`** 00.00<br>**`First Token Prediction:`** |
+| 0.0 | **`BLEU:`** 16.18<br>**`First Token Prediction:`** 61.72 | **`ROUGE:`** 1.63<br>**`First Token Prediction:`** 27.34 | **`ROUGE:`** 00.00<br>**`First Token Prediction:`** |
+| 0.1 | **`BLEU:`** 15.50<br>**`First Token Prediction:`** 60.94 | **`ROUGE:`** 1.43<br>**`First Token Prediction:`** 19.53 | **`ROUGE:`** 00.00<br>**`First Token Prediction:`** |
+| 0.3 | **`BLEU:`**  6.84<br>**`First Token Prediction:`** 52.34 | **`ROUGE:`** 1.53<br>**`First Token Prediction:`** 19.34 | **`ROUGE:`** 00.00<br>**`First Token Prediction:`** |
+| 0.5 | **`BLEU:`**  2.13<br>**`First Token Prediction:`** 59.38 | **`ROUGE:`** 1.23<br>**`First Token Prediction:`** 18.75 | **`ROUGE:`** 00.00<br>**`First Token Prediction:`** |
 
 <br><br>
 
@@ -61,7 +50,7 @@ python3 run.py -task ['translation', 'dialogue', 'summarization']
                -aux_ratio ["Type percent"]
                -search ['greedy', 'beam']
 ```
-<br>
+<br><br> 
 
 
 ## Reference
