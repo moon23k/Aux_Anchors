@@ -28,7 +28,7 @@ class Tester:
         with torch.no_grad():
             for batch in self.dataloader:
                 x = batch['x'].to(self.device)
-                y = batch['y']
+                y = batch['y'].to(self.device)
 
                 pred = self.predict(x)
                 scores = self.evaluate(pred, y)
@@ -68,7 +68,7 @@ class Tester:
 
 
     def evaluate(self, pred, label):
-        aux_score = (pred[:, 0] == label[:, 0]).sum().item() / pred.size(0) * 100
+        aux_score = (pred[:, 1] == label[:, 1]).sum().item() / pred.size(0) * 100
 
         pred = self.tokenize(pred)
         label = self.tokenize(label)
